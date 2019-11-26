@@ -25,12 +25,14 @@ def main():
     screen.fill((white)) 
     screen.blit(image, (left, top))
     pygame.display.flip()
+    print(image.get_rect())
     
     # define a variable to control the main loop
     running = True
 
     time.sleep(0.5)
 
+    min_y = image.get_rect()[3]
     framerate = 60
     jump = 2
     acceleration = 0.22
@@ -48,8 +50,12 @@ def main():
 
         if pygame.mouse.get_pressed()[0]:
             jump += acceleration
+            #Set so can't go below min y
             current_y = current_y - jump
-            
+
+        #if pos[1] < 20:
+         #   jump = 2
+          #  continue
         jump -= gravity
         current_y = current_y - jump
         
