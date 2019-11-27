@@ -9,6 +9,7 @@ class rocket_game():
         self.height = 400
         self.left = None
         self.top = None
+        self.altitute_top = 130
         self.white = (255, 255, 255)
         
         self.screen = None
@@ -16,12 +17,17 @@ class rocket_game():
         self.size = self.image.get_rect().size
         self.bottom = None
         self.current_y = None
+        self.altitute = 0
 
         self.running = True
         self.framerate = 60
-        self.jump = 2
+        self.speed = 2
+        self.max_speed = 5
         self.acceleration = 0.22
-        self.gravity = 0.08        
+        self.gravity_max = 0.2
+        self.gravity_min = 0.01
+        self.gravity_increment = 0.01
+        self.gravity = 0.01
         
     def main(self):
          
@@ -45,7 +51,7 @@ class rocket_game():
         time.sleep(0.5)
 
         self.framerate = 60
-        self.jump = 0
+        self.speed = 0
         self.acceleration = 0.22
         self.gravity = 0.075
         self.current_y = self.bottom
@@ -59,22 +65,29 @@ class rocket_game():
                     # change the value to False, to exit the main loop
                     self.running = False
 
-
+            #If the mouse is being held, then update the speed until max speed reached
             if pygame.mouse.get_pressed()[0]:
-                self.jump += self.acceleration
+                self.speed += self.acceleration
                 #Set so can't go below min y
-                self.current_y = self.current_y - self.jump
-                
-            self.jump -= self.gravity
-            if self.current_y - self.jump > self.bottom:
-                self.current_y = self.bottom
-                self.jump = 0
-            elif self.current_y - self.jump < self.top:
-                self.current_y = self.top
-                self.jump = 0
+                self.current_y = self.current_y - self.speed
+                self.gravity = max(self.gravity - self.gravity_increment, self.gravity_min)
             else:
-                self.current_y -= self.jump
+                self.gravity = min(self.gravity + self.gravity_increment, self.gravity_max)
+
+
+            self.speed = min(self.speed - self.gravity, self.max_speed)
             
+            self.altitute += self.speed
+            if self.current_y - self.speed > self.bottom:
+                self.current_y = self.bottom
+                self.speed = 0
+                self.altitute = 0
+            elif self.altitute + self.speed >= self.altitute_top:
+                self.current_y = self.top
+            else:
+                self.current_y -= self.speed
+
+            print(str(self.altitute), str(self.speed))
             self.screen.fill(self.white)
             self.screen.blit(self.image,(self.left, self.current_y))
             pygame.display.flip()
